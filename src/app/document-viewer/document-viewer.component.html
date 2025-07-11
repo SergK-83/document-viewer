@@ -1,0 +1,34 @@
+<div class="container">
+  @if (documentViewerService.document$ | async; as document) {
+    <div
+      class="document-viewer"
+      [ngStyle]="{
+        transform: `scale(${documentViewerService.zoomLevel()})`,
+      }"
+    >
+      <button
+        class="document-viewer__action"
+        matMiniFab
+        matTooltip="Добавить аннотацию"
+        (click)="addAnnotation()"
+      >
+        <mat-icon>add</mat-icon>
+      </button>
+
+      @for (page of document.pages; let first = $first; track page.number) {
+        <div class="document-viewer__page">
+          <img
+            [ngSrc]="page.imageUrl"
+            fill
+            [alt]="page.number"
+            [priority]="first"
+          />
+        </div>
+      }
+
+      @for (annotation of document.annotations; let i = $index; track i) {
+        <app-annotation [container]="elRef" [annotation]="annotation"></app-annotation>
+      }
+    </div>
+  }
+</div>

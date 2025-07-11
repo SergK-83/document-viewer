@@ -1,0 +1,33 @@
+:host {
+  overflow: auto;
+  padding: 30px 0;
+}
+
+.document-viewer {
+  position: relative;
+  flex-grow: 1;
+  width: 794px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 20px;
+  margin: 0 auto;
+  transition: transform 0.2s ease-in-out;
+  transform-origin: top center;
+
+  &__page {
+    position: relative;
+    width: 100%;
+    height: 1123px;
+
+    img {
+      object-fit: contain;
+    }
+  }
+
+  &__action {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    margin: 20px 20px -80px auto;
+  }
+}

@@ -1,0 +1,16 @@
+<div
+  #draggableElement
+  class="annotation"
+  [ngStyle]="{
+    'left.px': annotation.position.left,
+    'top.px': annotation.position.top,
+  }"
+  (mousedown)="onMouseDown($event)"
+  (mouseup)="onMouseUp()"
+  (mousemove)="onMouseMove($event)"
+>
+  <div class="annotation__close"></div>
+  <p class="annotation__text">
+    {{ annotation.text }}
+  </p>
+</div>

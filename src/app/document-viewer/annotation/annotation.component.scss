@@ -1,0 +1,23 @@
+.annotation {
+  position: absolute;
+  padding: 8px;
+  top: 0;
+  left: 0;
+  background-color: transparent;
+  border: 1px solid #ffd966;
+  border-radius: 4px;
+  cursor: grab;
+  user-select: none;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: #ffd966;
+    opacity: 0.5;
+  }
+
+  &__text {
+    margin: 0;
+  }
+}

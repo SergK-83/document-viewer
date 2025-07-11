@@ -1,0 +1,14 @@
+<h2 mat-dialog-title>Добавление аннотации</h2>
+<mat-dialog-content>
+  <mat-form-field>
+    <mat-label>Текст аннотации</mat-label>
+    <textarea matInput [formControl]="annotationControl"></textarea>
+    @if (annotationControl.hasError('required')) {
+      <mat-error>Поле обязательно для заполнения</mat-error>
+    }
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button matButton (click)="cancel()">Отмена</button>
+  <button matButton (click)="save()" cdkFocusInitial>Ok</button>
+</mat-dialog-actions>

@@ -1,0 +1,25 @@
+.main-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &-wrap {
+    padding: 15px 0;
+    background-color: #008b8c;
+    color: #fff;
+  }
+
+  &__title {
+    font-weight: 500;
+    font-size: 28px;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+
+    button:last-child {
+        margin-left: 40px;
+    }
+  }
+}
