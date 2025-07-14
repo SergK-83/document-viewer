@@ -61,12 +61,13 @@ export class DocumentViewerComponent {
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
     if (this.draggingItem) {
-      const newLeft = event.clientX - this.dragOffset.x;
-      const newTop = event.clientY - this.dragOffset.y;
+      const zoomLevel = this.documentViewerService.zoomLevel();
+      const newLeft = event.clientX / zoomLevel - this.dragOffset.x;
+      const newTop = event.clientY / zoomLevel - this.dragOffset.y;
 
       const minLeft = 0;
       const minTop = 0;
-      
+
       const maxLeft =
         this.containerEl.nativeElement.offsetWidth -
         this.draggingItem.elementRef.nativeElement.offsetWidth;
@@ -94,14 +95,33 @@ export class DocumentViewerComponent {
   onScroll() {
     if (this.draggingItem) {
       const position = this.draggingItem.annotation().position;
-      const newScrollTop = this.elRef.nativeElement.scrollTop;
-      const newScrollLeft = this.elRef.nativeElement.scrollLeft;
+      const zoomLevel = this.documentViewerService.zoomLevel();
+
+      const newScrollTop = this.elRef.nativeElement.scrollTop / zoomLevel;
+      const newScrollLeft = this.elRef.nativeElement.scrollLeft / zoomLevel;
       const scrollTopDiff = newScrollTop - this.scrollTop;
       const scrollLeftDiff = newScrollLeft - this.scrollLeft;
 
-      this.draggingItem.annotation().position.top = position.top + scrollTopDiff;
-      this.draggingItem.annotation().position.left =
-        position.left + scrollLeftDiff;
+      const minLeft = 0;
+      const minTop = 0;
+      const newLeft = position.left + scrollLeftDiff;
+      const newTop = position.top + scrollTopDiff
+
+      const maxLeft =
+        this.containerEl.nativeElement.offsetWidth -
+        this.draggingItem.elementRef.nativeElement.offsetWidth;
+      const maxTop =
+        this.containerEl.nativeElement.offsetHeight -
+        this.draggingItem.elementRef.nativeElement.offsetHeight;
+
+      this.draggingItem.annotation().position.left = Math.max(
+        minLeft,
+        Math.min(maxLeft, newLeft),
+      );
+      this.draggingItem.annotation().position.top = Math.max(
+        minTop,
+        Math.min(maxTop, newTop),
+      );
 
       this.scrollTop = newScrollTop;
       this.scrollLeft = newScrollLeft;
@@ -112,14 +132,18 @@ export class DocumentViewerComponent {
   }
 
   onMouseDown(event: MouseEvent, component: AnnotationComponent): void {
+    const zoomLevel = this.documentViewerService.zoomLevel();
+
     this.draggingItem = component;
     this.dragOffset.x =
-      event.clientX - this.draggingItem.elementRef.nativeElement.offsetLeft;
+      event.clientX / zoomLevel -
+      this.draggingItem.elementRef.nativeElement.offsetLeft;
     this.dragOffset.y =
-      event.clientY - this.draggingItem.elementRef.nativeElement.offsetTop;
+      event.clientY / zoomLevel -
+      this.draggingItem.elementRef.nativeElement.offsetTop;
 
-    this.scrollTop = this.elRef.nativeElement.scrollTop;
-    this.scrollLeft = this.elRef.nativeElement.scrollLeft;
+    this.scrollTop = this.elRef.nativeElement.scrollTop / zoomLevel;
+    this.scrollLeft = this.elRef.nativeElement.scrollLeft / zoomLevel;
   }
 
   addAnnotation(): void {
