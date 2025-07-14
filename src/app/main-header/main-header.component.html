@@ -11,11 +11,13 @@
         <button matIconButton (click)="documentViewerService.zoomIn()">
           <mat-icon>add</mat-icon>
         </button>
-        <div>{{ documentViewerService.getZoomValue()}}</div>
+        <div>{{ documentViewerService.getZoomValue() }}</div>
         <button matIconButton (click)="documentViewerService.zoomOut()">
           <mat-icon>remove</mat-icon>
         </button>
-        <button matButton="elevated">Save</button>
+        <button matButton="elevated" (click)="documentViewerService.save()">
+          Save
+        </button>
       </div>
     </div>
   </div>

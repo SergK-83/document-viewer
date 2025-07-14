@@ -1,3 +1,4 @@
+import { DocumentViewerService } from '@/app/services/document-viewer.service';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   FormControl,
@@ -15,7 +16,6 @@ import {
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { DocumentViewerService } from '../services/document-viewer.service';
 
 @Component({
   selector: 'app-dialog-annotation',

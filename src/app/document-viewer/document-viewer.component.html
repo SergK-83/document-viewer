@@ -1,10 +1,9 @@
 <div class="container">
   @if (documentViewerService.document$ | async; as document) {
     <div
+      #container
       class="document-viewer"
-      [ngStyle]="{
-        transform: `scale(${documentViewerService.zoomLevel()})`,
-      }"
+      [style.transform]="`scale(${documentViewerService.zoomLevel()})`"
     >
       <button
         class="document-viewer__action"
@@ -26,8 +25,18 @@
         </div>
       }
 
-      @for (annotation of document.annotations; let i = $index; track i) {
-        <app-annotation [container]="elRef" [annotation]="annotation"></app-annotation>
+      @for (
+        annotation of document.annotations;
+        let i = $index;
+        track annotation.id
+      ) {
+        <app-annotation
+          #draggableComponent
+          [style.top.px]="annotation.position.top"
+          [style.left.px]="annotation.position.left"
+          (mousedown)="onMouseDown($event, draggableComponent)"
+          [annotation]="annotation"
+        ></app-annotation>
       }
     </div>
   }

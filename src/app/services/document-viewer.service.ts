@@ -1,19 +1,16 @@
-import {
-  inject,
-  Injectable,
-  signal,
-} from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
 import {
   BehaviorSubject,
+  catchError,
   delay,
-  distinctUntilKeyChanged,
+  iif,
   Observable,
   of,
-  switchMap,
+  tap,
 } from 'rxjs';
-import { DialogAnnotationComponent } from '../dialog-annotation/dialog-annotation.component';
+import { DialogAnnotationComponent } from '../document-viewer/dialog-annotation/dialog-annotation.component';
+import { MOCK_DATA } from './mock-data';
 
 interface DocumentPage {
   number: number;
@@ -21,6 +18,7 @@ interface DocumentPage {
 }
 
 export interface Annotation {
+  id: string;
   text: string;
   position: {
     top: number;
@@ -34,31 +32,7 @@ export interface DocumentView {
   annotations?: Annotation[];
 }
 
-const data: DocumentView = {
-  name: 'test doc',
-  pages: [
-    {
-      number: 1,
-      imageUrl: 'assets/pages/1.png',
-    },
-    {
-      number: 2,
-      imageUrl: 'assets/pages/2.png',
-    },
-    {
-      number: 3,
-      imageUrl: 'assets/pages/3.png',
-    },
-    {
-      number: 4,
-      imageUrl: 'assets/pages/4.png',
-    },
-    {
-      number: 5,
-      imageUrl: 'assets/pages/5.png',
-    },
-  ],
-};
+
 
 @Injectable({
   providedIn: 'root',
@@ -73,19 +47,6 @@ export class DocumentViewerService {
   private readonly minZoom = 0.6;
   private readonly maxZoom = 2;
   private readonly zoomStep = 0.1;
-
-  private readonly activatedRoute = inject(ActivatedRoute);
-
-  constructor() {
-    this.activatedRoute.queryParams
-      .pipe(
-        distinctUntilKeyChanged('id'),
-        switchMap(({ id }) => (id ? this.getDocument(id) : of(null))),
-      )
-      .subscribe((document) => {
-        this._document$.next(document);
-      });
-  }
 
   zoomIn(): void {
     const currentZoomLevel = this.zoomLevel();
@@ -115,6 +76,7 @@ export class DocumentViewerService {
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         const newAnnotation: Annotation = {
+          id: String(Date.now()),
           text: result,
           position: {
             top: posTop + 20,
@@ -131,14 +93,30 @@ export class DocumentViewerService {
         }
 
         this._document$.next(document);
-        
       }
     });
   }
 
-  private getDocument(id: string): Observable<DocumentView> {
-    console.log('getDocument() id', id);
+  getDocument(id: string): Observable<DocumentView | null> {
+    return iif(() => !!id, of(MOCK_DATA).pipe(delay(500)), of(null)).pipe(
+      catchError((err) => {
+        console.log('Ошибка: ', err);
+        return of(null);
+      }),
+      tap((document) => {
+        this._document$.next(document);
+      }),
+    );
+  }
 
-    return of(data).pipe(delay(500));
+  removeAnnotation(id: string): void {
+    const document = this._document$.value;
+
+    document!.annotations = document!.annotations!.filter((a) => a.id !== id);
+    this._document$.next(document);
+  }
+
+  save(): void {
+    console.log('Документ успешно сохранен!!!', this._document$.value);
   }
 }
