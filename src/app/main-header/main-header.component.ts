@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { DocumentViewerService } from '../services/document-viewer.service';
+import { DocumentService } from '../services/document.service';
 import { AsyncPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { ZoomService } from '../services/zoom.service';
 
 @Component({
   standalone: true,
@@ -13,5 +14,6 @@ import { MatIconModule } from '@angular/material/icon';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainHeaderComponent {
-  readonly documentViewerService = inject(DocumentViewerService);
+  readonly documentService = inject(DocumentService);
+  readonly zoomService = inject(ZoomService);
 }

@@ -1,5 +1,5 @@
 <div class="main-header-wrap">
-  @let document = documentViewerService.document$ | async;
+  @let document = documentService.document$ | async;
 
   <div class="container">
     <div class="main-header">
@@ -9,14 +9,14 @@
         </div>
 
         <div class="main-header__actions">
-          <button matIconButton (click)="documentViewerService.zoomIn()">
+          <button matIconButton (click)="zoomService.zoomIn()">
             <mat-icon>add</mat-icon>
           </button>
-          <div>{{ documentViewerService.getZoomValue() }}</div>
-          <button matIconButton (click)="documentViewerService.zoomOut()">
+          <div>{{ zoomService.getZoomValue() }}</div>
+          <button matIconButton (click)="zoomService.zoomOut()">
             <mat-icon>remove</mat-icon>
           </button>
-          <button matButton="elevated" (click)="documentViewerService.save()">
+          <button matButton="elevated" (click)="documentService.save()">
             Save
           </button>
         </div>

@@ -1,4 +1,3 @@
-import { DocumentViewerService } from '@/app/services/document-viewer.service';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   FormControl,
@@ -36,7 +35,6 @@ import { MatInputModule } from '@angular/material/input';
 export class DialogAnnotationComponent {
   readonly dialogRef = inject(MatDialogRef<DialogAnnotationComponent>);
   readonly data = inject<number>(MAT_DIALOG_DATA);
-  readonly documentViewerService = inject(DocumentViewerService);
 
   readonly annotationControl = new FormControl<string>('', Validators.required);
 

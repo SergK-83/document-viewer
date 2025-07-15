@@ -37,35 +37,22 @@ export interface DocumentView {
 @Injectable({
   providedIn: 'root',
 })
-export class DocumentViewerService {
+export class DocumentService {
   private readonly _document$ = new BehaviorSubject<DocumentView | null>(null);
   readonly document$ = this._document$.asObservable();
 
   readonly dialog = inject(MatDialog);
 
-  readonly zoomLevel = signal(1);
-  private readonly minZoom = 0.6;
-  private readonly maxZoom = 2;
-  private readonly zoomStep = 0.1;
-
-  zoomIn(): void {
-    const currentZoomLevel = this.zoomLevel();
-
-    if (currentZoomLevel < this.maxZoom) {
-      this.zoomLevel.set(currentZoomLevel + this.zoomStep);
-    }
-  }
-
-  zoomOut(): void {
-    const currentZoomLevel = this.zoomLevel();
-
-    if (currentZoomLevel > this.minZoom) {
-      this.zoomLevel.set(currentZoomLevel - this.zoomStep);
-    }
-  }
-
-  getZoomValue(): string {
-    return `${(this.zoomLevel() * 100).toFixed()}%`;
+  getDocument(id: string): Observable<DocumentView | null> {
+    return iif(() => !!id, of(MOCK_DATA).pipe(delay(500)), of(null)).pipe(
+      catchError((err) => {
+        console.log('Ошибка: ', err);
+        return of(null);
+      }),
+      tap((document) => {
+        this._document$.next(document);
+      }),
+    );
   }
 
   addAnnotation(posTop: number): void {
@@ -95,18 +82,6 @@ export class DocumentViewerService {
         this._document$.next(document);
       }
     });
-  }
-
-  getDocument(id: string): Observable<DocumentView | null> {
-    return iif(() => !!id, of(MOCK_DATA).pipe(delay(500)), of(null)).pipe(
-      catchError((err) => {
-        console.log('Ошибка: ', err);
-        return of(null);
-      }),
-      tap((document) => {
-        this._document$.next(document);
-      }),
-    );
   }
 
   removeAnnotation(id: string): void {

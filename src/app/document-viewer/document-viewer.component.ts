@@ -6,7 +6,7 @@ import {
   inject,
   ViewChild,
 } from '@angular/core';
-import { DocumentViewerService } from '../services/document-viewer.service';
+import { DocumentService } from '../services/document.service';
 import { AsyncPipe, NgOptimizedImage } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,6 +16,8 @@ import { AnnotationComponent } from './annotation/annotation.component';
 import { ActivatedRoute } from '@angular/router';
 import { distinctUntilKeyChanged, of, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ZoomService } from '../services/zoom.service';
+import { AnnotationMoveService } from './services/annotation-move.service';
 
 @Component({
   standalone: true,
@@ -32,19 +34,16 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   templateUrl: './document-viewer.component.html',
   styleUrl: './document-viewer.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [AnnotationMoveService],
 })
 export class DocumentViewerComponent {
   private readonly activatedRoute = inject(ActivatedRoute);
-  readonly documentViewerService = inject(DocumentViewerService);
-  readonly elRef = inject(ElementRef);
+  readonly documentService = inject(DocumentService);
+  readonly zoomService = inject(ZoomService);
+  readonly annotationMoveService = inject(AnnotationMoveService);
+  readonly scrollContainerEl = inject(ElementRef);
 
-  private draggingItem: AnnotationComponent | null = null;
-  private readonly dragOffset = { x: 0, y: 0 };
-
-  private scrollTop = 0;
-  private scrollLeft = 0;
-
-  @ViewChild('container') containerEl!: ElementRef;
+  @ViewChild('documentContainer') documentContainerEl!: ElementRef;
 
   constructor() {
     this.activatedRoute.queryParams
@@ -52,7 +51,7 @@ export class DocumentViewerComponent {
         takeUntilDestroyed(),
         distinctUntilKeyChanged('id'),
         switchMap(({ id }) =>
-          id ? this.documentViewerService.getDocument(id) : of(null),
+          id ? this.documentService.getDocument(id) : of(null),
         ),
       )
       .subscribe();
@@ -60,95 +59,25 @@ export class DocumentViewerComponent {
 
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
-    if (this.draggingItem) {
-      const zoomLevel = this.documentViewerService.zoomLevel();
-      const newLeft = event.clientX / zoomLevel - this.dragOffset.x;
-      const newTop = event.clientY / zoomLevel - this.dragOffset.y;
-
-      const minLeft = 0;
-      const minTop = 0;
-
-      const maxLeft =
-        this.containerEl.nativeElement.offsetWidth -
-        this.draggingItem.elementRef.nativeElement.offsetWidth;
-      const maxTop =
-        this.containerEl.nativeElement.offsetHeight -
-        this.draggingItem.elementRef.nativeElement.offsetHeight;
-
-      this.draggingItem.annotation().position.left = Math.max(
-        minLeft,
-        Math.min(maxLeft, newLeft),
-      );
-      this.draggingItem.annotation().position.top = Math.max(
-        minTop,
-        Math.min(maxTop, newTop),
-      );
-    }
+    this.annotationMoveService.onMouseMove(event, this.documentContainerEl);
   }
 
   @HostListener('document:mouseup')
   onMouseUp() {
-    this.draggingItem = null;
+    this.annotationMoveService.onMouseUp();
   }
 
   @HostListener('scroll')
   onScroll() {
-    if (this.draggingItem) {
-      const position = this.draggingItem.annotation().position;
-      const zoomLevel = this.documentViewerService.zoomLevel();
-
-      const newScrollTop = this.elRef.nativeElement.scrollTop / zoomLevel;
-      const newScrollLeft = this.elRef.nativeElement.scrollLeft / zoomLevel;
-      const scrollTopDiff = newScrollTop - this.scrollTop;
-      const scrollLeftDiff = newScrollLeft - this.scrollLeft;
-
-      const minLeft = 0;
-      const minTop = 0;
-      const newLeft = position.left + scrollLeftDiff;
-      const newTop = position.top + scrollTopDiff
-
-      const maxLeft =
-        this.containerEl.nativeElement.offsetWidth -
-        this.draggingItem.elementRef.nativeElement.offsetWidth;
-      const maxTop =
-        this.containerEl.nativeElement.offsetHeight -
-        this.draggingItem.elementRef.nativeElement.offsetHeight;
-
-      this.draggingItem.annotation().position.left = Math.max(
-        minLeft,
-        Math.min(maxLeft, newLeft),
-      );
-      this.draggingItem.annotation().position.top = Math.max(
-        minTop,
-        Math.min(maxTop, newTop),
-      );
-
-      this.scrollTop = newScrollTop;
-      this.scrollLeft = newScrollLeft;
-
-      this.dragOffset.x = this.dragOffset.x - scrollLeftDiff;
-      this.dragOffset.y = this.dragOffset.y - scrollTopDiff;
-    }
-  }
-
-  onMouseDown(event: MouseEvent, component: AnnotationComponent): void {
-    const zoomLevel = this.documentViewerService.zoomLevel();
-
-    this.draggingItem = component;
-    this.dragOffset.x =
-      event.clientX / zoomLevel -
-      this.draggingItem.elementRef.nativeElement.offsetLeft;
-    this.dragOffset.y =
-      event.clientY / zoomLevel -
-      this.draggingItem.elementRef.nativeElement.offsetTop;
-
-    this.scrollTop = this.elRef.nativeElement.scrollTop / zoomLevel;
-    this.scrollLeft = this.elRef.nativeElement.scrollLeft / zoomLevel;
+    this.annotationMoveService.onScroll(
+      this.scrollContainerEl,
+      this.documentContainerEl,
+    );
   }
 
   addAnnotation(): void {
-    this.documentViewerService.addAnnotation(
-      this.elRef.nativeElement.scrollTop,
+    this.documentService.addAnnotation(
+      this.scrollContainerEl.nativeElement.scrollTop,
     );
   }
 }

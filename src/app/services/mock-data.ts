@@ -1,4 +1,4 @@
-import { DocumentView } from './document-viewer.service';
+import { DocumentView } from './document.service';
 
 export const MOCK_DATA: DocumentView = {
   name: 'test doc',

@@ -1,9 +1,9 @@
 <div class="container">
-  @if (documentViewerService.document$ | async; as document) {
+  @if (documentService.document$ | async; as document) {
     <div
-      #container
+      #documentContainer
       class="document-viewer"
-      [style.transform]="`scale(${documentViewerService.zoomLevel()})`"
+      [style.transform]="`scale(${zoomService.zoomLevel()})`"
     >
       <button
         class="document-viewer__action"
@@ -34,7 +34,7 @@
           #draggableComponent
           [style.top.px]="annotation.position.top"
           [style.left.px]="annotation.position.left"
-          (mousedown)="onMouseDown($event, draggableComponent)"
+          (mousedown)="annotationMoveService.onMouseDown($event, draggableComponent, scrollContainerEl)"
           [annotation]="annotation"
         ></app-annotation>
       }

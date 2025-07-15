@@ -1,7 +1,7 @@
 import {
   Annotation,
-  DocumentViewerService,
-} from '@/app/services/document-viewer.service';
+  DocumentService,
+} from '@/app/services/document.service';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -21,7 +21,7 @@ import { MatIconModule } from '@angular/material/icon';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AnnotationComponent {
-  readonly documentViewerService = inject(DocumentViewerService);
+  readonly documentService = inject(DocumentService);
   readonly elementRef = inject(ElementRef);
   readonly annotation = input.required<Annotation>()
 }
