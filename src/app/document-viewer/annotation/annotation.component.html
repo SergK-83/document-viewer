@@ -1,12 +1,11 @@
-<div
-  class="annotation"
->
+<div class="annotation">
+  @let annotation = annotation$();
   <mat-icon
     class="annotation__remove"
-    (click)="documentService.removeAnnotation(annotation().id)"
+    (click)="annotationService.removeAnnotation(annotation.id)"
     >close</mat-icon
   >
   <p class="annotation__text">
-    {{ annotation().text }}
+    {{ annotation.text }}
   </p>
 </div>

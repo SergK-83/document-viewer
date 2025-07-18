@@ -1,29 +1,35 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  HostListener,
   inject,
   ViewChild,
 } from '@angular/core';
 import { DocumentService } from '../services/document.service';
-import { AsyncPipe, NgOptimizedImage } from '@angular/common';
+import { NgOptimizedImage } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialogModule } from '@angular/material/dialog';
 import { AnnotationComponent } from './annotation/annotation.component';
 import { ActivatedRoute } from '@angular/router';
-import { distinctUntilKeyChanged, of, switchMap } from 'rxjs';
+import {
+  distinctUntilKeyChanged,
+  of,
+  switchMap,
+} from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ZoomService } from '../services/zoom.service';
-import { AnnotationMoveService } from './services/annotation-move.service';
+import {
+  AnnotationMoveService,
+} from './services/annotation-move.service';
+import { AnnotationService } from './services/annotation.service';
 
 @Component({
   standalone: true,
   selector: 'app-document-viewer',
   imports: [
-    AsyncPipe,
     NgOptimizedImage,
     MatButtonModule,
     MatIconModule,
@@ -34,16 +40,17 @@ import { AnnotationMoveService } from './services/annotation-move.service';
   templateUrl: './document-viewer.component.html',
   styleUrl: './document-viewer.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [AnnotationMoveService],
+  providers: [AnnotationMoveService, AnnotationService],
 })
-export class DocumentViewerComponent {
+export class DocumentViewerComponent implements AfterViewInit {
   private readonly activatedRoute = inject(ActivatedRoute);
   readonly documentService = inject(DocumentService);
   readonly zoomService = inject(ZoomService);
+  private readonly annotationService = inject(AnnotationService);
   readonly annotationMoveService = inject(AnnotationMoveService);
-  readonly scrollContainerEl = inject(ElementRef);
+  readonly scrollContainer = inject(ElementRef);
 
-  @ViewChild('documentContainer') documentContainerEl!: ElementRef;
+  @ViewChild('documentContainer') documentContainer!: ElementRef;
 
   constructor() {
     this.activatedRoute.queryParams
@@ -57,27 +64,14 @@ export class DocumentViewerComponent {
       .subscribe();
   }
 
-  @HostListener('document:mousemove', ['$event'])
-  onMouseMove(event: MouseEvent): void {
-    this.annotationMoveService.onMouseMove(event, this.documentContainerEl);
-  }
+  ngAfterViewInit(): void {
+    this.annotationMoveService.initMoveData(this.scrollContainer, this.documentContainer)
 
-  @HostListener('document:mouseup')
-  onMouseUp() {
-    this.annotationMoveService.onMouseUp();
-  }
-
-  @HostListener('scroll')
-  onScroll() {
-    this.annotationMoveService.onScroll(
-      this.scrollContainerEl,
-      this.documentContainerEl,
-    );
   }
 
   addAnnotation(): void {
-    this.documentService.addAnnotation(
-      this.scrollContainerEl.nativeElement.scrollTop,
+    this.annotationService.addAnnotation(
+      this.scrollContainer.nativeElement.scrollTop,
     );
   }
 }

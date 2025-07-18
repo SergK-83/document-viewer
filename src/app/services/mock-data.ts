@@ -1,4 +1,4 @@
-import { DocumentView } from './document.service';
+import { DocumentView } from "../models/model";
 
 export const MOCK_DATA: DocumentView = {
   name: 'test doc',
