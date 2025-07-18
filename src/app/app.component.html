@@ -1,3 +1,9 @@
-<app-main-header></app-main-header>
+<section
+  class="main-section"
+  [appLoader]="pageLoaderService.loaderActive$()"
+  [loaderConfig]="loaderConfig"
+>
+  <app-main-header></app-main-header>
 
-<router-outlet></router-outlet>
+  <router-outlet></router-outlet>
+</section>
