@@ -30,7 +30,9 @@
         let i = $index;
         track annotation.id
       ) {
-        <app-annotation
+
+        <!-- Реализация перетаскивания аннотации через сервис -->
+        <!-- <app-annotation
           #draggableComponent
           [style.top.px]="annotation.position.top"
           [style.left.px]="annotation.position.left"
@@ -40,6 +42,16 @@
               component: draggableComponent,
             })
           "
+          [annotation$]="annotation"
+        ></app-annotation> -->
+
+        <!-- Реализация перетаскивания аннотации через директиву -->
+        <app-annotation
+          appAnnotationMove
+          [scrollContainerEl]="scrollContainer.nativeElement"
+          [documentContainerEl]="documentContainer"
+          [style.top.px]="annotation.position.top"
+          [style.left.px]="annotation.position.left"
           [annotation$]="annotation"
         ></app-annotation>
       }

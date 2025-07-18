@@ -25,6 +25,7 @@ import {
   AnnotationMoveService,
 } from './services/annotation-move.service';
 import { AnnotationService } from './services/annotation.service';
+import { AnnotationMoveDirective } from './directives/annotation-move.directive';
 
 @Component({
   standalone: true,
@@ -36,6 +37,7 @@ import { AnnotationService } from './services/annotation.service';
     MatTooltipModule,
     MatDialogModule,
     AnnotationComponent,
+    AnnotationMoveDirective
   ],
   templateUrl: './document-viewer.component.html',
   styleUrl: './document-viewer.component.scss',

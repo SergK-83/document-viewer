@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MainHeaderComponent } from './main-header/main-header.component';
 
@@ -7,7 +7,8 @@ import { MainHeaderComponent } from './main-header/main-header.component';
   selector: 'app-root',
   imports: [RouterOutlet, MainHeaderComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
 }
